@@ -1,0 +1,1465 @@
+BACKEND DEVELOPMENT PRACTICAL RECORD – ORIGINAL PROGRAMS AND OUTPUTS
+Academic Year: 2026–2027
+Source: Uploaded Backend Development Practical Record PDF (15 practicals).
+
+IMPORTANT NOTE ABOUT OUTPUTS
+The original PDF contains output screenshots. A plain-text file cannot embed those screenshots, so the OUTPUT sections below preserve any output instructions/text and the result statements that were extractable from the PDF. For the original screenshots, refer to the corresponding OUTPUT pages in the PDF.
+
+==============================================================================
+PRACTICAL 1: ASP.NET Core Web API – Display “Hello World”
+==============================================================================
+ORIGINAL PROGRAM / CODE (extracted from the practical record)
+
+[Source PDF page 5]
+Program:
+
+Program.cs
+   var builder = WebApplication.CreateBuilder(args);
+   var app = builder.Build();
+   app.MapGet("/", () => "Hello World");
+   app.Run();
+
+OUTPUT
+
+[Source PDF page 6]
+OUTPUT:
+
+
+
+
+Result:
+Thus, the ASP.NET Core Web API application was successfully created and executed. The
+“Hello World” message was displayed successfully in the web browser
+
+
+PRACTICAL 2: Web API to Display Student, College and Department Information
+==============================================================================
+ORIGINAL PROGRAM / CODE (extracted from the practical record)
+
+[Source PDF page 8]
+Program:
+
+StudentController.cs
+using Microsoft.AspNetCore.Mvc;
+namespace StudentAPI.Controllers
+{
+  [ApiController]
+  [Route("[controller]")]
+  public class StudentController : ControllerBase
+  {
+     [HttpGet]
+     public string GetStudent()
+     {
+        return "Student Name: Rahul, Roll No: 101";
+     }
+     [HttpGet("College")]
+     public string GetCollege()
+     {
+        return "College: ABC Engineering College";
+     }
+     [HttpGet("Department")]
+     public string GetDepartment()
+     {
+        return "Department: Computer Science and Engineering";
+     }
+  }
+}
+ Program.cs
+var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddControllers();
+var app = builder.Build();
+app.UseHttpsRedirection();
+app.MapControllers();
+app.Run();
+
+OUTPUT
+
+[Source PDF page 9]
+OUTPUT:
+
+
+
+
+Result:
+Thus, the ASP.NET Core Web API was successfully created with multiple GET endpoints to
+display Student, College, and Department information.
+
+
+PRACTICAL 3: Student Controller with Multiple GET Methods
+==============================================================================
+ORIGINAL PROGRAM / CODE (extracted from the practical record)
+
+[Source PDF page 11]
+Program:
+StudentController.cs
+using Microsoft.AspNetCore.Mvc;
+namespace StudentAPI.Controllers
+{
+  [ApiController]
+  [Route("[controller]")]
+  public class StudentController : ControllerBase
+  {
+     [HttpGet]
+     public string GetStudent()
+     {
+        return "Student Name: John";
+     }
+     [HttpGet("RollNo")]
+     public string GetRollNo()
+     {
+        return "Roll No: 101";
+     }
+     [HttpGet("Department")]
+     public string GetDepartment()
+     {
+        return "Department: Computer Science";
+     }
+  }
+}
+Program.cs
+var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddControllers();
+var app = builder.Build();
+app.UseHttpsRedirection();
+app.MapControllers();
+app.Run();
+
+OUTPUT
+
+[Source PDF page 12]
+OUTPUT:
+
+
+
+
+Result:
+Thus, the Student Controller was successfully created with multiple GET methods, and the
+student name, roll number, and department information were retrieved successfully.
+
+
+PRACTICAL 4: Read Configuration Values from appsettings.json
+==============================================================================
+ORIGINAL PROGRAM / CODE (extracted from the practical record)
+
+[Source PDF page 14]
+Program:
+appsettings.json
+{
+  "College": {
+    "Name": "ABC Engineering College",
+    "Department": "Computer Science",
+    "Location": "Chennai"
+  }
+}
+ConfigController:
+using Microsoft.AspNetCore.Mvc;
+namespace ConfigAPI.Controllers
+{
+    [ApiController]
+    [Route("[controller]")]
+    public class ConfigController : ControllerBase
+    {
+      private readonly IConfiguration _configuration;
+      public ConfigController(IConfiguration configuration)
+      {
+         _configuration = configuration;
+      }
+      [HttpGet]
+      public IActionResult GetConfiguration()
+      {
+         var college = _configuration["College:Name"];
+         var department = _configuration["College:Department"];
+         var location = _configuration["College:Location"];
+         return Ok(new
+         {
+            College = college,
+            Department = department,
+            Location = location
+         });
+      }
+    }
+}
+Program.cs
+var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddControllers();
+var app = builder.Build();
+app.UseHttpsRedirection();
+app.MapControllers();
+app.Run();
+
+OUTPUT
+
+[Source PDF page 15]
+OUTPUT:
+
+
+
+
+Result:
+
+Thus, the ASP.NET Core Web API was successfully developed to read configuration values
+from appsettings.json and display the College Name, Department, and Location through a
+GET endpoint.
+
+
+PRACTICAL 5: Student Model with Dependency Injection
+==============================================================================
+ORIGINAL PROGRAM / CODE (extracted from the practical record)
+
+[Source PDF page 17]
+Program:
+Student.cs
+namespace StudentApp.Models
+{
+  public class Student
+  {
+     public int Id { get; set; }
+     public string Name { get; set; }
+     public int Age { get; set; }
+     public string Department { get; set; }
+  }
+}
+IStudentService.cs
+using StudentApp.Models;
+namespace StudentApp.Services
+{
+  public interface IStudentService
+  {
+     List<Student> GetStudents();
+  }
+}
+StudentService.cs
+using StudentApp.Models;
+namespace StudentApp.Services
+{
+  public class StudentService : IStudentService
+  {
+     public List<Student> GetStudents()
+     {
+       return new List<Student>
+       {
+          new Student
+          {
+             Id = 1,
+             Name = "Rahul",
+             Age = 20,
+             Department = "Computer Science"
+          },
+          new Student
+          {
+             Id = 2,
+             Name = "Anjali",
+             Age = 21,
+             Department = "Information Technology"
+          }
+       };
+     }
+  }
+}
+
+[Source PDF page 18]
+Program.cs
+using StudentApp.Services;
+var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddControllers();
+builder.Services.AddScoped<IStudentService, StudentService>();
+var app = builder.Build();
+app.MapControllers();
+app.Run();
+
+
+StudentController.cs
+using Microsoft.AspNetCore.Mvc;
+using StudentApp.Services;
+namespace StudentApp.Controllers
+{
+  [ApiController]
+  [Route("api/[controller]")]
+  public class StudentController : ControllerBase
+  {
+     private readonly IStudentService _studentService;
+
+        public StudentController(IStudentService studentService)
+        {
+          _studentService = studentService;
+        }
+        [HttpGet]
+        public IActionResult GetStudents()
+        {
+          return Ok(_studentService.GetStudents());
+        }
+    }
+}
+
+OUTPUT
+
+[Source PDF page 19]
+OUTPUT:
+
+
+
+
+Result:
+Thus, the Student model and Student Service were successfully created, and Dependency
+Injection was implemented to retrieve and display student information through an ASP.NET
+Core Web API.
+
+
+PRACTICAL 6: Create SQL Server Database and Connect Using Entity Framework Core in .NET 10
+==============================================================================
+ORIGINAL PROGRAM / CODE (extracted from the practical record)
+
+[Source PDF page 21]
+Program:
+Student.cs
+ namespace StudentApi.Models
+{
+   public class Student
+   {
+     public int Id { get; set; }
+     public string Name { get; set; } = "";
+     public string Email { get; set; } = "";
+     public int Age { get; set; }
+   }
+}
+
+Install EF Core packages Run:
+
+Install-Package Microsoft.EntityFrameworkCore
+
+Install-Package Microsoft.EntityFrameworkCore.SqlServer
+
+Install-Package Microsoft.EntityFrameworkCore.Tools
+
+swagger
+
+Install-Package Swashbuckle.AspNetCore
+
+
+AppDbContext.cs
+using Microsoft.EntityFrameworkCore;
+using StudentApi.Models;
+namespace StudentApi.Data
+{
+  public class AppDbContext : DbContext
+  {
+     public AppDbContext(DbContextOptions<AppDbContext> options)
+       : base(options)
+     {
+     }
+     public DbSet<Student> Students { get; set; }
+  }
+}
+
+
+appsettings.json
+
+{
+
+    "ConnectionStrings": {
+
+[Source PDF page 22]
+"DefaultConnection":
+"Server=(localdb)\\MSSQLLocalDB;Database=StudentDb;Trusted_Connection=True;TrustServerCertificate=True;"
+
+    },
+
+    "Logging": {
+
+     "LogLevel": {
+
+         "Default": "Information",
+
+         "Microsoft.AspNetCore": "Warning"
+
+     }
+
+    },
+
+    "AllowedHosts": "*"
+
+}
+
+
+Program.cs
+using Microsoft.EntityFrameworkCore;
+using StudentApi.Data;
+var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddDbContext<AppDbContext>(options =>
+   options.UseSqlServer(
+      builder.Configuration.GetConnectionString("DefaultConnection")
+   )
+);
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+var app = builder.Build();
+if (app.Environment.IsDevelopment())
+{
+   app.UseSwagger();
+   app.UseSwaggerUI();
+}
+app.UseHttpsRedirection();
+app.UseAuthorization();
+app.MapControllers();
+app.Run();
+
+[Source PDF page 23]
+CREATE SQL SERVER DATABASE USING MIGRATION
+
+Now Entity Framework Core will create the actual SQL Server database.
+
+Open:
+
+Tools → NuGet Package Manager → Package Manager Console
+
+Step 1: Create Migration Run:
+
+Add-Migration InitialCreate
+
+This creates a Migrations folder.
+
+The migration contains instructions for creating the database and table.
+
+Step 2: Create Database Run:
+
+Update-Database
+
+This command actually creates the database in SQL Server.
+
+CHECK THE SQL SERVER DATABASE
+
+Go to:
+
+View → SQL Server Object Explorer
+
+Expand:
+
+(localdb)\MSSQLLocalDB - Databases – StudentDb – Tables - dbo.__EFMigrationsHistory -
+dbo.Students
+
+CREATE STUDENTS CONTROLLER
+StudentsController.cs
+using Microsoft.AspNetCore.Mvc;
+using StudentApi.Data;
+using StudentApi.Models;
+namespace StudentApi.Controllers
+{
+  [Route("api/[controller]")]
+  [ApiController]
+  public class StudentsController : ControllerBase
+  {
+     private readonly AppDbContext _db;
+     public StudentsController(AppDbContext db)
+     {
+        _db = db;
+     }
+     // GET: api/Students
+
+[Source PDF page 24]
+[HttpGet]
+        public IActionResult GetStudents()
+        {
+           return Ok(_db.Students.ToList());
+        }
+        // POST: api/Students
+        [HttpPost]
+        public IActionResult AddStudent(Student student)
+        {
+           _db.Students.Add(student);
+           _db.SaveChanges();
+           return Ok(student);
+        }
+        // GET: api/Students/1
+        [HttpGet("{id}")]
+        public IActionResult GetStudent(int id)
+        {
+           var student = _db.Students.Find(id);
+           if (student == null)
+           {
+              return NotFound();
+           }
+           return Ok(student);
+        }
+        // DELETE: api/Students/1
+        [HttpDelete("{id}")]
+        public IActionResult DeleteStudent(int id)
+        {
+           var student = _db.Students.Find(id);
+           if (student == null)
+           {
+              return NotFound();
+           }
+           _db.Students.Remove(student);
+           _db.SaveChanges();
+           return Ok("Student Deleted");
+        }
+    }
+}
+
+OUTPUT
+
+[Source PDF page 25]
+OUTPUT:
+[Source PDF page 26]
+Result:
+The SQL Server database was successfully created and connected to the .NET 10 application
+using Entity Framework Core. The database and required tables were created successfully,
+and the application was able to access the database without errors
+
+
+PRACTICAL 7: CRUD Operations on Student Records Using Entity Framework Core and ASP.NET Core Web API
+==============================================================================
+ORIGINAL PROGRAM / CODE (extracted from the practical record)
+
+[Source PDF page 28]
+Program:
+
+CREATE STUDENT MODEL
+Student.cs
+namespace CollegeStudentAPI
+{
+  public class Student
+  {
+    public int Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public int Age { get; set; }
+    public string Course { get; set; } = string.Empty;
+  }
+}
+
+
+Install Required NuGet Packages
+Install-Package Microsoft.EntityFrameworkCore.SqlServer
+Install-Package Microsoft.EntityFrameworkCore.Tools
+
+Install Swagger:
+Install-Package Swashbuckle.AspNetCore
+
+
+CREATE DB CONTEXT
+StudentContext.cs
+using Microsoft.EntityFrameworkCore;
+namespace CollegeStudentAPI
+{
+  public class StudentContext : DbContext
+  {
+     public StudentContext(DbContextOptions<StudentContext> options)
+       : base(options)
+     {
+     }
+     public DbSet<Student> Students { get; set; }
+  }
+}
+
+Configure Database Connection
+appsettings.json
+Write:
+{
+  "ConnectionStrings": {
+   "DefaultConnection":
+"Server=(localdb)\\MSSQLLocalDB;Database=CollegeStudentDB;Trusted_Connection=True;TrustServerCertificate=True;"
+  },
+  "Logging": {
+   "LogLevel": {
+     "Default": "Information",
+
+[Source PDF page 29]
+"Microsoft.AspNetCore": "Warning"
+     }
+    },
+    "AllowedHosts": "*"
+}
+
+Configure Program.cs
+Program.cs
+using CollegeStudentAPI;
+using Microsoft.EntityFrameworkCore;
+var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddControllers();
+builder.Services.AddDbContext<StudentContext>(options =>
+   options.UseSqlServer(
+      builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+var app = builder.Build();
+if (app.Environment.IsDevelopment())
+{
+   app.UseSwagger();
+   app.UseSwaggerUI();
+}
+app.UseHttpsRedirection();
+app.UseAuthorization();
+app.MapControllers();
+app.Run();
+
+
+Create Database Migration
+Tools → NuGet Package Manager → Package Manager Console
+Run:
+Add-Migration InitialCreate
+In Package Manager Console run:
+      Update-Database
+
+CREATE STUDENTS CONTROLLER
+StudentsController.cs
+using Microsoft.AspNetCore.Mvc;
+namespace CollegeStudentAPI.Controllers
+{
+  [Route("api/[controller]")]
+  [ApiController]
+  public class StudentsController : ControllerBase
+  {
+     private readonly StudentContext _context;
+     public StudentsController(StudentContext context)
+     {
+        _context = context;
+     }
+     // CREATE
+
+[Source PDF page 30]
+[HttpPost]
+public IActionResult Create(Student student)
+{
+  _context.Students.Add(student);
+  _context.SaveChanges();
+
+  return Ok(student);
+}
+// READ ALL
+[HttpGet]
+public IActionResult GetAll()
+{
+   var students = _context.Students.ToList();
+
+   return Ok(students);
+}
+// READ BY ID
+[HttpGet("{id}")]
+public IActionResult GetById(int id)
+{
+   var student = _context.Students.Find(id);
+   if (student == null)
+   {
+      return NotFound();
+   }
+   return Ok(student);
+}
+// UPDATE
+[HttpPut("{id}")]
+public IActionResult Update(int id, Student student)
+{
+   var existingStudent = _context.Students.Find(id);
+   if (existingStudent == null)
+   {
+      return NotFound();
+   }
+   existingStudent.Name = student.Name;
+   existingStudent.Age = student.Age;
+   existingStudent.Course = student.Course;
+   _context.SaveChanges();
+   return Ok(existingStudent);
+}
+// DELETE
+[HttpDelete("{id}")]
+public IActionResult Delete(int id)
+{
+   var student = _context.Students.Find(id);
+   if (student == null)
+   {
+      return NotFound();
+   }
+
+[Source PDF page 31]
+_context.Students.Remove(student);
+            _context.SaveChanges();
+            return Ok("Student deleted successfully");
+        }
+    }
+}
+
+OUTPUT
+
+[Source PDF page 32]
+OUTPUT:
+[Source PDF page 35]
+Result:
+Thus, the ASP.NET Core Web API application successfully performs CRUD operations on
+Student records using Entity Framework Core and SQL Server.
+
+
+PRACTICAL 8: Implement Code First Approach and generate the database using Migrations
+==============================================================================
+ORIGINAL PROGRAM / CODE (extracted from the practical record)
+
+[Source PDF page 37]
+Program:
+Create Model
+Student.cs
+namespace CodeFirstDemo.Models
+{
+  public class Student
+  {
+     public int Id { get; set; }
+     public string Name { get; set; }
+     public int Age { get; set; }
+     public string Course { get; set; }
+  }
+}
+Install Packages:
+Install-Package Microsoft.EntityFrameworkCore.SqlServer
+Install-Package Microsoft.EntityFrameworkCore.Tools
+
+Create DbContext:
+AppDbContext.cs
+
+using Microsoft.EntityFrameworkCore;
+using CodeFirstDemo.Models;
+
+namespace CodeFirstDemo.Data
+{
+  public class AppDbContext : DbContext
+  {
+    public AppDbContext(DbContextOptions<AppDbContext> options)
+       : base(options)
+    {
+    }
+
+      public DbSet<Student> Students { get; set; }
+  }
+}
+Add Connection String
+Open appsettings.json
+{
+  "ConnectionStrings": {
+    "DefaultConnection":
+"Server=(localdb)\\MSSQLLocalDB;Database=StudentDB;Trusted_Connection=True;TrustServerCertificate=True;"
+  }
+}
+Configure Program.cs
+using CodeFirstDemo.Data;
+using Microsoft.EntityFrameworkCore;
+var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddDbContext<AppDbContext>(options =>
+
+[Source PDF page 38]
+options.UseSqlServer(
+      builder.Configuration.GetConnectionString("DefaultConnection")
+  ));
+builder.Services.AddControllers();
+var app = builder.Build();
+app.MapControllers();
+app.Run();
+
+Create ONE Migration
+In Package Manager Console:
+Add-Migration InitialCreate
+Migration folder will be created.
+
+Create Database
+Update-Database
+Database will be created.
+
+OUTPUT
+
+[Source PDF page 39]
+OUTPUT:
+
+
+
+
+Result:
+The Code First approach was successfully implemented in .NET 10 using Entity Framework
+Core. A migration was created and applied successfully, generating the required SQL Server
+database and tables from the C# model classes.
+
+
+PRACTICAL 9: Develop REST APIs using GET, POST, PUT and DELETE methods
+==============================================================================
+ORIGINAL PROGRAM / CODE (extracted from the practical record)
+
+[Source PDF page 41]
+Program:
+Create Student Class:
+Student.cs
+Write:
+namespace StudentAPI
+{
+  public class Student
+  {
+     public int Id { get; set; }
+     public string Name { get; set; } = "";
+  }
+}
+Create Student Controller:
+StudentController.cs
+using Microsoft.AspNetCore.Mvc;
+namespace StudentAPI.Controllers
+{
+  [ApiController]
+  [Route("api/[controller]")]
+  public class StudentController : ControllerBase
+  {
+     static List<Student> students = new List<Student>();
+     [HttpGet]
+     public List<Student> Get()
+     {
+        return students;
+     }
+     [HttpPost]
+     public Student Post(Student student)
+     {
+        students.Add(student);
+        return student;
+     }
+     [HttpPut]
+     public Student Put(Student student)
+     {
+        var s = students.First(x => x.Id == student.Id);
+        s.Name = student.Name;
+        return s;
+     }
+     [HttpDelete]
+     public string Delete(int id)
+     {
+        students.RemoveAll(x => x.Id == id);
+        return "Deleted";
+     }
+  }
+}
+Configure Swagger
+Install-Package Swashbuckle.AspNetCore
+
+[Source PDF page 42]
+Program.cs:
+var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+var app = builder.Build();
+app.UseSwagger();
+app.UseSwaggerUI();
+app.UseHttpsRedirection();
+app.UseAuthorization();
+app.MapControllers();
+app.Run();
+
+OUTPUT
+
+[Source PDF page 43]
+OUTPUT:
+[Source PDF page 45]
+Result:
+Thus, a simple REST API was successfully developed using GET, POST, PUT and DELETE
+methods in ASP.NET Core Web API, and the APIs were tested using Swagger.
+
+
+PRACTICAL 10: Validate user input using Data Annotations and Model Validation
+==============================================================================
+ORIGINAL PROGRAM / CODE (extracted from the practical record)
+
+[Source PDF page 47]
+Program:
+ IN Models
+Student.cs
+Write:
+using System.ComponentModel.DataAnnotations;
+
+namespace StudentValidation.Models
+{
+  public class Student
+  {
+    [Required]
+    public string Name { get; set; }
+
+        [Required]
+        [EmailAddress]
+        public string Email { get; set; }
+
+        [Required]
+        [Range(18, 60)]
+        public int Age { get; set; }
+    }
+}
+
+In Controller
+StudentController.cs
+Add:
+using Microsoft.AspNetCore.Mvc;
+using StudentValidation.Models;
+
+namespace StudentValidation.Controllers
+{
+  public class StudentController : Controller
+  {
+    public IActionResult Index()
+    {
+       return View();
+    }
+
+        [HttpPost]
+        public IActionResult Index(Student student)
+        {
+          if (ModelState.IsValid)
+          {
+             return Content("Student details are valid!");
+          }
+
+            return View(student);
+        }
+    }
+}
+
+[Source PDF page 48]
+In View
+Student folder - Index.cshtml
+
+@model StudentValidation.Models.Student
+
+<h2>Student Registration</h2>
+
+<form asp-action="Index" method="post">
+
+  <label>Name:</label>
+  <input asp-for="Name" />
+  <span asp-validation-for="Name"></span>
+
+  <br /><br />
+
+  <label>Email:</label>
+  <input asp-for="Email" />
+  <span asp-validation-for="Email"></span>
+
+  <br /><br />
+
+  <label>Age:</label>
+  <input asp-for="Age" />
+  <span asp-validation-for="Age"></span>
+
+  <br /><br />
+
+  <button type="submit">Submit</button>
+
+</form>
+
+Program.cs
+
+var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddControllersWithViews();
+
+var app = builder.Build();
+
+if (!app.Environment.IsDevelopment())
+{
+   app.UseExceptionHandler("/Home/Error");
+   app.UseHsts();
+}
+
+app.UseHttpsRedirection();
+app.UseRouting();
+
+app.UseAuthorization();
+
+[Source PDF page 49]
+app.MapStaticAssets();
+
+app.MapControllerRoute(
+  name: "default",
+  pattern: "{controller=Home}/{action=Index}/{id?}")
+  .WithStaticAssets();
+
+app.Run();
+
+OUTPUT
+
+[Source PDF page 50]
+OUTPUT:
+
+
+
+
+Enter the details…
+
+If everything is proper it will show…
+
+
+
+
+Result:
+
+Thus, an ASP.NET Core MVC application was successfully developed to validate Student
+input using Data Annotations and Model Validation, with validation error messages displayed
+for invalid input
+
+
+PRACTICAL 11: Test Web APIs using Swagger and Postman
+==============================================================================
+ORIGINAL PROGRAM / CODE (extracted from the practical record)
+
+[Source PDF page 52]
+Add API Code
+
+Program.cs
+
+var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddEndpointsApiExplorer();
+
+builder.Services.AddSwaggerGen();
+
+var app = builder.Build();
+
+app.UseSwagger();
+
+app.UseSwaggerUI();
+
+app.MapGet("/hello", () =>
+
+{
+
+    return "Hello World";
+
+});
+
+app.MapGet("/student", () =>
+
+{
+
+    return new
+
+    {
+
+         Id = 1,
+
+         Name = "Rahul",
+
+         Course = "BCA"
+
+    };
+
+});
+app.Run();
+
+Install Swagger Package:
+Install-Package Swashbuckle.AspNetCore
+
+OUTPUT
+
+[Source PDF page 53]
+Swagger Output:
+
+                  S
+
+
+
+
+Open Postman
+[Source PDF page 54]
+Postman Test OUTPUT :
+
+
+
+
+Result:
+
+Thus, ASP.NET Core Web API was successfully created and its GET endpoints were tested
+using both Swagger and Postman.
+
+
+PRACTICAL 12: Implement JWT Authentication and Secure Endpoints
+==============================================================================
+ORIGINAL PROGRAM / CODE (extracted from the practical record)
+
+[Source PDF page 56]
+Program:
+Program.cs
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+var b = WebApplication.CreateBuilder(args);
+var k = "123456789012345678901234567890123456";
+b.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+.AddJwtBearer(o => o.TokenValidationParameters = new()
+{
+   ValidateIssuerSigningKey = true,
+   IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(k)),
+   ValidateIssuer = false,
+   ValidateAudience = false
+});
+
+b.Services.AddAuthorization();
+var app = b.Build();
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.MapGet("/login", () =>
+{
+  var t = new JwtSecurityToken(
+    claims: new[] { new Claim(ClaimTypes.Name, "Ravi") },
+    expires: DateTime.UtcNow.AddMinutes(30),
+    signingCredentials: new SigningCredentials(
+        new SymmetricSecurityKey(Encoding.UTF8.GetBytes(k)),
+        SecurityAlgorithms.HmacSha256));
+
+   return new { token = new JwtSecurityTokenHandler().WriteToken(t) };
+});
+
+app.MapGet("/secure", () => "Welcome to Secure API!")
+  .RequireAuthorization();
+
+app.Run();
+
+OUTPUT
+
+[Source PDF page 57]
+OUTPUT:
+TOKEN :
+
+
+
+
+                             Test Secure Endpoint
+Authorization → Type → Bearer Token
+
+
+
+
+Test Without Token
+
+
+
+
+Result:
+Thus, JWT Authentication was successfully implemented in an ASP.NET Core Web API,
+and the /secure endpoint was successfully protected using JWT-based authorization.
+
+
+PRACTICAL 13: Implement Role-Based Authorization for Admin and User Roles
+==============================================================================
+ORIGINAL PROGRAM / CODE (extracted from the practical record)
+
+[Source PDF page 59]
+Program:
+Program.cs
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+var b = WebApplication.CreateBuilder(args);
+var k = "123456789012345678901234567890123456";
+b.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+.AddJwtBearer(o => o.TokenValidationParameters = new()
+{
+   ValidateIssuerSigningKey = true,
+   IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(k)),
+   ValidateIssuer = false,
+   ValidateAudience = false
+});
+b.Services.AddAuthorization();
+var app = b.Build();
+app.UseAuthentication();
+app.UseAuthorization();
+app.MapGet("/login/admin", () => Token("Admin"));
+app.MapGet("/login/user", () => Token("User"));
+app.MapGet("/admin", () => "Welcome Admin!")
+  .RequireAuthorization(x => x.RequireRole("Admin"));
+
+app.MapGet("/user", () => "Welcome User!")
+  .RequireAuthorization(x => x.RequireRole("Admin", "User"));
+app.Run();
+string Token(string role)
+{
+   var t = new JwtSecurityToken(
+      claims: new[] { new Claim(ClaimTypes.Role, role) },
+      expires: DateTime.UtcNow.AddMinutes(30),
+      signingCredentials: new SigningCredentials(
+         new SymmetricSecurityKey(Encoding.UTF8.GetBytes(k)),
+         SecurityAlgorithms.HmacSha256));
+   return new JwtSecurityTokenHandler().WriteToken(t);
+}
+
+OUTPUT
+
+[Source PDF page 60]
+OUTPUT:
+Run the API
+https://localhost:xxxx/login/admin
+
+
+
+
+Copy the returned JWT token.
+
+
+
+
+Test Admin Endpoint
+https://localhost:xxxx/admin
+Authorization → Bearer Token
+
+
+
+
+Generate User Token
+https://localhost:xxxx/login/user
+Click Send.
+[Source PDF page 61]
+Copy the returned token.
+
+
+
+
+Test User Endpoint
+https://localhost:xxxx/user
+Authorization → Bearer Token
+
+
+
+
+Test Role Restriction
+Use the User token to access:
+https://localhost:xxxx/admin
+[Source PDF page 62]
+Result:
+
+Thus, Role-Based Authorization was successfully implemented in an ASP.NET Core Web
+API using JWT Authentication, allowing access to API endpoints according to Admin and
+User roles.
+
+
+PRACTICAL 14: Develop a File Upload and Download API
+==============================================================================
+ORIGINAL PROGRAM / CODE (extracted from the practical record)
+
+[Source PDF page 64]
+Program:
+Program.cs:
+
+var b = WebApplication.CreateBuilder(args);
+var app = b.Build();
+app.MapPost("/upload", async (IFormFile file) =>
+{
+  if (file == null || file.Length == 0)
+     return Results.BadRequest("Select a file");
+
+  var folder = Path.Combine(app.Environment.ContentRootPath, "Uploads");
+  Directory.CreateDirectory(folder);
+  var path = Path.Combine(folder, Path.GetFileName(file.FileName));
+
+  using var stream = File.Create(path);
+  await file.CopyToAsync(stream);
+
+   return Results.Ok("File uploaded successfully");
+}).DisableAntiforgery();
+
+app.MapGet("/download/{name}", (string name) =>
+{
+  var folder = Path.Combine(app.Environment.ContentRootPath, "Uploads");
+  var path = Path.Combine(folder, Path.GetFileName(name));
+
+  if (!File.Exists(path))
+     return Results.NotFound("File not found");
+
+   return Results.File(path, "application/octet-stream", name);
+});
+app.Run();
+
+OUTPUT
+
+[Source PDF page 65]
+OUTPUT:
+
+Upload File Using Postman
+https://localhost:xxxx/upload
+
+
+
+
+Download File Using Postman
+https://localhost:XXXX/download/test.txt
+
+
+
+
+Result:
+Thus, a simple ASP.NET Core Web API for file upload and download was successfully
+developed and tested using Postman.
+
+
+PRACTICAL 15: Develop a Mini Student Management System API with CRUD, Validation and Authentication
+==============================================================================
+ORIGINAL PROGRAM / CODE (extracted from the practical record)
+
+[Source PDF page 67]
+Program:
+Create Student Model
+Student.cs
+using System.ComponentModel.DataAnnotations;
+namespace StudentManagement.Models
+{
+  public class Student
+  {
+     public int Id { get; set; }
+     [Required]
+     public string Name { get; set; } = "";
+     [Required]
+     [EmailAddress]
+     public string Email { get; set; } = "";
+     [Range(18, 60)]
+     public int Age { get; set; }
+  }
+}
+Create Student Controller
+StudentsController.cs
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using StudentManagement.Models;
+namespace StudentManagement.Controllers
+{
+  [ApiController]
+  [Route("api/[controller]")]
+  [Authorize]
+  public class StudentsController : ControllerBase
+  {
+     static List<Student> students = new List<Student>();
+     [HttpGet]
+     public List<Student> GetStudents()
+     {
+        return students;
+     }
+     [HttpGet("{id}")]
+     public Student GetStudent(int id)
+     {
+        return students.FirstOrDefault(s => s.Id == id);
+     }
+     [HttpPost]
+     public Student AddStudent(Student student)
+     {
+        students.Add(student);
+        return student;
+     }
+     [HttpPut("{id}")]
+     public Student UpdateStudent(int id, Student student)
+     {
+        var oldStudent = students.FirstOrDefault(s => s.Id == id);
+
+[Source PDF page 68]
+oldStudent.Name = student.Name;
+      oldStudent.Email = student.Email;
+      oldStudent.Age = student.Age;
+      return oldStudent;
+    }
+    [HttpDelete("{id}")]
+    public string DeleteStudent(int id)
+    {
+      var student = students.FirstOrDefault(s => s.Id == id);
+      students.Remove(student);
+      return "Student deleted";
+    }
+  }
+}
+Create Login Controller
+LoginController.cs
+Code:
+using Microsoft.AspNetCore.Mvc;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+namespace StudentManagement.Controllers
+{
+  [ApiController]
+  [Route("api/[controller]")]
+  public class LoginController : ControllerBase
+  {
+     [HttpPost]
+     public string Login(string username, string password)
+     {
+       if (username == "admin" && password == "1234")
+       {
+          var key = new SymmetricSecurityKey(
+             Encoding.UTF8.GetBytes("this-is-my-secret-key-1234567890"));
+          var token = new JwtSecurityToken(
+             claims: new[]
+             {
+                new Claim(ClaimTypes.Name, username)
+             },
+             expires: DateTime.Now.AddHours(1),
+             signingCredentials: new SigningCredentials(
+                key,
+                SecurityAlgorithms.HmacSha256)
+          );
+          return new JwtSecurityTokenHandler().WriteToken(token);
+       }
+       return "Invalid username or password";
+     }
+  }
+}
+
+[Source PDF page 69]
+Program.cs
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(c =>
+{
+   c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.OpenApiSecurityScheme
+   {
+      Type = Microsoft.OpenApi.SecuritySchemeType.Http,
+      Scheme = "bearer"
+   });
+   c.AddSecurityRequirement(document =>
+      new Microsoft.OpenApi.OpenApiSecurityRequirement
+      {
+       [new Microsoft.OpenApi.OpenApiSecuritySchemeReference("Bearer", document)] = []
+      });
+});
+var key = "this-is-my-secret-key-1234567890";
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+   .AddJwtBearer(x =>
+   {
+      x.TokenValidationParameters = new TokenValidationParameters
+      {
+         ValidateIssuerSigningKey = true,
+         IssuerSigningKey = new SymmetricSecurityKey(
+            Encoding.UTF8.GetBytes(key)),
+         ValidateIssuer = false,
+         ValidateAudience = false
+      };
+   });
+builder.Services.AddAuthorization();
+var app = builder.Build();
+app.UseSwagger();
+app.UseSwaggerUI();
+app.UseAuthentication();
+app.UseAuthorization();
+app.MapControllers();
+app.Run();
+
+OUTPUT
+
+[Source PDF page 70]
+OUTPUT:
+[Source PDF page 71]
+Authorize [JWT Token]
+[Source PDF page 74]
+Test Validation
+
+
+
+
+Result:
+Thus, a Mini Student Management System API was successfully developed using ASP.NET
+Core Web API with CRUD operations, input validation, JWT authentication, authorization,
+and Swagger-based API testing.
+
+
+END OF 15 PRACTICALS
